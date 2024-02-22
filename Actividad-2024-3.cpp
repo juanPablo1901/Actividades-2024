@@ -30,6 +30,14 @@ int main(){
 		if(verificar>=2){
 			verificar = 0;
 		}
+		}
+		if(verificar<=-1){
+			verificar = 0;
+		}
+		if(verificar==false){
+			cout<<"No se pueden ingresar letras al sistema \n"<<endl;
+		}
+		
 		cout<<"Ingresa un numero"<<"["<<"] \n"<<endl;
 		
 		
