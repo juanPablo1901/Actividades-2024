@@ -113,6 +113,6 @@ void eliminarNodo(nodo *&list, int valor) {
 
         cout << "Se han eliminado todos los nodos con el valor " << valor << endl;
     } else {
-        cout << "La lista está vacía." << endl;
+        cout << "La lista estÃ¡ vacÃ­a." << endl;
     }
 }
