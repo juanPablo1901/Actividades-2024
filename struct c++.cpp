@@ -199,13 +199,24 @@ void mostrarNodo() {
 	}
 }
 
+void calcular(){
+	int suma = 0, prom;
+	nodo *actual = new nodo;
+	aux->siguiente=aux;
+    	actual = primero;
+	while(primero!=){
+		
+	}
+	
+}
+
 void calcularMayorMenor(){
 	int mayor = 0, menor=9999;
 	nodo *actual = new nodo;
-    actual = primero;
-	while(primero!=NULL){
-		if((actual->dato) > mayor){
-			mayor = actual->dato;
+    	actual = primero;
+	while(primero!=ultimo){
+		if((primero->dato) > mayor){
+			mayor = primero->dato;
 		}
 		if((actual->dato)<menor){
 			menor = actual->dato;
