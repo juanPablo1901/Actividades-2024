@@ -30,14 +30,14 @@ int main (){
 	cin>>opcion;
 	switch (opcion) {
             case 1:
-                cout << "\n Insertar una Pila: ";
+                cout << "\n Insertar una Cola: ";
                 cin>>dato;
 				insertarCola(frente,fin,dato);
                 break;
             case 2:
             	cout<<"\n Quitar: ";
             	if(frente==NULL){
-					cout<<"\n Error en saca("<<dato<<"). La pila esta vacia \n"<<endl;
+					cout<<"\n Error en sacar("<<dato<<"). La }Cola esta vacia \n"<<endl;
 					}	
                 while(frente!=NULL){
                 	suprimirCola(frente, fin, dato);
