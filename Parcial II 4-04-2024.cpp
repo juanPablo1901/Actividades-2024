@@ -173,8 +173,6 @@ void insertarLista(Nodo *&list, int n) {
     }
 
     nuevo_nodo->siguiente = aux1;
-
-    cout << "Elemento " << n << " insertado en la lista" << endl;
 }
 
 
