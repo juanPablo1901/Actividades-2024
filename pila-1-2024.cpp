@@ -11,9 +11,10 @@ struct Nodo {
 void agregarpila(Nodo *&, int);
 void sacarPila(Nodo *&, int &);
 void eliminarPila(Nodo *&, int &);
+void mostrarPila(Nodo *&, int &);
 
 int main (){
-	
+	system("color f1");
 	Nodo *pila = NULL;
 	int dato, opcion;
 	
@@ -22,7 +23,8 @@ int main (){
 	cout<<"\n|           *PILA*          |";
 	cout<<"\n|---------------------------|";
 	cout<<"\n|         1.Insertar        |";
-	cout<<"\n|         2.Sacar           |";
+	cout<<"\n|         2.Mostrar         |";
+	cout<<"\n|         3.Sacar           |";
 	cout<<"\n|         0.Salir           |";
 	cout<<"\n|---------------------------|";
 	cout<<"\n Escoja una Opcion: ";
@@ -34,6 +36,10 @@ int main (){
 				agregarpila(pila,dato);
                 break;
             case 2:
+            	cout << "\n Mostrando: \n";
+				mostrarPila(pila,dato);
+            	break;
+            case 3:
             	cout<<"\n Sacar Pila: ";
             	if(pila==NULL){
 					cout<<"\n Error en saca("<<dato<<"). La pila esta vacia \n"<<endl;
@@ -70,6 +76,14 @@ void agregarpila(Nodo *&pila, int n){
 	cout<<"\n Elemento "<<n<<" agregado a Pila correctamente "<<endl;
 }
 
+void mostrarPila(Nodo *&pila, int &n){
+	
+	Nodo *aux = pila;
+	while(aux!=NULL){
+		cout<<aux->elemento<<"\n";
+		aux=aux->siguiente;
+	}
+}
 
 void sacarPila(Nodo *&pila, int &n){	
 	Nodo *aux = pila;
@@ -77,15 +91,3 @@ void sacarPila(Nodo *&pila, int &n){
 	pila = aux->siguiente;
 	delete aux;
 }
-	
-	
-
-
-
-
-
-
-
-
-
-
