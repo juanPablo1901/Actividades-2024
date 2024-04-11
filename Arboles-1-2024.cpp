@@ -62,7 +62,6 @@ void menu (){
 	cout<<"\n|---------------------------|";
 	cout<<"\n|         1.Insertar        |";
 	cout<<"\n|         2.Mostrar         |";
-	cout<<"\n|         3.Eliminar        |";
 	cout<<"\n|         0.Salir           |";
 	cout<<"\n|---------------------------|";
 	cout<<"\n Escoja una Opcion: ";
