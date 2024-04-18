@@ -8,11 +8,14 @@ struct nodo{
 	int dato;
 	nodo *der;
 	nodo *izq;
+	nodo *no;
 };
 
 nodo *arbol = NULL;
 void insertar(nodo *&,int);
 void mostrarArbol(nodo *, int);
+void MostrarNivel(nodo *, int);
+int  cantNivel(nodo *);
 nodo *crearNodo(int);
 
 nodo *crearNodo(int n){
@@ -20,6 +23,7 @@ nodo *crearNodo(int n){
 	nuevo_nodo->dato=n;
 	nuevo_nodo->der=NULL;
 	nuevo_nodo->izq=NULL;
+	nuevo_nodo->no=NULL;
 	
 	return nuevo_nodo;
 }
@@ -31,10 +35,10 @@ void insertar (nodo *&arbol, int n){
 		arbol = nuevo_nodo;
 	}else{
 		int valorRaiz = arbol->dato;
-		if(n<valorRaiz){
+		 if(n<valorRaiz){
 			insertar(arbol->izq,n);
 			
-		}else{
+		}if (n>valorRaiz){
 			insertar(arbol->der,n);
 		}
 	}
@@ -46,7 +50,7 @@ void mostrarArbol(nodo *arbol, int cont){
 		}else{
 		mostrarArbol(arbol->der,cont+1);
 			for(int i=0;i<cont;i++){
-				cout<<"    ";
+				cout<<"   ";
 			}
 			cout<<"("<<arbol->dato<<")"<<endl;
 			mostrarArbol(arbol->izq, cont+1);	
@@ -71,7 +75,6 @@ void preOrden(nodo*arbol){
 		cout<<" ["<<arbol->dato<<"]->";
 		preOrden(arbol->izq);
 		preOrden(arbol->der);
-		
 	}
 }
 
@@ -83,7 +86,31 @@ void inOrden(nodo*arbol){
 		inOrden(arbol->izq);
 		cout<<" ["<<arbol->dato<<"]->";
 		inOrden(arbol->der);
+	}
+}
+
+
+int cantNivel(nodo *arbol){
+	if (arbol!=NULL){
+		int izq = cantNivel(arbol->izq)+1;
+		int der = cantNivel(arbol->der)+1;
+		if(izq>der){
+			return izq;
+		}else{
+			return der;
+		}
 		
+	}
+}
+
+void MostrarNivel(nodo *arbol, int n){
+	if(arbol != NULL){
+		if(n==0){
+			cout<<" ["<<arbol->dato<<"]->";
+		}
+		
+		MostrarNivel(arbol->izq, n-1);
+		MostrarNivel(arbol->der, n-1);
 	}
 }
 
@@ -109,7 +136,7 @@ system("color f1");
 			cin>>opcion;
 			switch(opcion){
 				case 1:
-					cout<<"Ingrese caracter"<<endl;
+					cout<<"Ingrese un numero"<<endl;
 					cin>>dato;
 					insertar(arbol,dato);
 					break;
@@ -125,6 +152,12 @@ system("color f1");
 					cout<<"\n Mostrando el In Orden \n";
 					inOrden(arbol);
 					cout<<"\n\n";
+					for(int i=0; i<cantNivel(arbol); i++){
+						cout<<"\n Nivel "<<i<<"\n";
+						MostrarNivel(arbol, i);
+						cout<<"\n\n";
+					}
+					
 					break;	
 				case 3:
 					cout<<"Eliminando Arbol"<<endl;
