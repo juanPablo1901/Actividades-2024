@@ -4,7 +4,7 @@
 
 using namespace std;
 
-struct nodo{
+struct nodo {
 	int dato;
 	int altura;
 	nodo *der;
@@ -12,10 +12,8 @@ struct nodo{
 	nodo *padre;
 };
 
-nodo *arbol = NULL;
-void insertar(nodo *&,int);
+nodo* arbol = NULL;
 
-int alturaNodo(nodo *);
 
 void mostrarArbol(nodo *, int);
 void MostrarNivel(nodo *, int);
@@ -33,39 +31,89 @@ nodo* minimo(nodo*);
 void reemplazar(nodo*, nodo*);
 void destruirNodo(nodo*);
 
+int alturaNodo(nodo * nodo){
+	if (nodo == NULL)
+	return 0;
+	return nodo->altura;
+}
 
-nodo *crearNodo(int n){
+int maximo(int a, int b){
+	return (a>b) ? a: b;
+}
+
+nodo *crearNodo(int dato){
 	nodo *nuevo_nodo = new nodo();
-	nuevo_nodo->dato=n;
+	nuevo_nodo->dato=dato;
 	nuevo_nodo->der=NULL;
 	nuevo_nodo->izq=NULL;
-
+	nuevo_nodo->altura = 1;
 	return nuevo_nodo;
 }
 
-
-void insertar(nodo *&arbol, int n){
-	if (arbol == NULL){
-		nodo *nuevo_nodo = crearNodo(n);
-		arbol = nuevo_nodo;
-	}else{
-		int valorRaiz = arbol->dato;
-		 if(n<valorRaiz){
-			insertar(arbol->izq,n);
-			alturaNodo(arbol->izq);
-			
-		}if (n>valorRaiz){
-			insertar(arbol->der,n);
-			alturaNodo(arbol->der);
-		}
-	}
+nodo* rotacionDerecha(nodo* y){
+	nodo* x = y->izq;
+	nodo* z = x->der;
+	
+	x->der = y;
+	y->izq = z;
+	
+	y->altura = maximo(alturaNodo(y->izq), alturaNodo(y->der)) + 1;
+	x->altura = maximo(alturaNodo(x->izq), alturaNodo(x->der)) + 1;
+	
+	return x;
+	
 }
 
+nodo* rotacionIzquierda(nodo* x){
+	nodo* y = x->der;
+	nodo* z = y->izq;
+	
+	y->izq = x;
+	x->der = z;
+	
+	x->altura = maximo(alturaNodo(x->izq), alturaNodo(x->der)) + 1;
+	y->altura = maximo(alturaNodo(y->izq), alturaNodo(y->der)) + 1;
+	
+	return y;	
+}
 
+nodo* insertar(nodo* raiz, int dato) {
+    if (raiz == NULL) {
+        return crearNodo(dato);
+    }
+
+    if (dato < raiz->dato) {
+        raiz->izq = insertar(raiz->izq, dato);
+    } else if (dato > raiz->dato) {
+        raiz->der = insertar(raiz->der, dato);
+    } else {
+        return raiz;
+    }
+
+    raiz->altura = 1 + maximo(alturaNodo(raiz->izq), alturaNodo(raiz->der));
+
+    int balance = alturaNodo(raiz->izq) - alturaNodo(raiz->der);
+
+    if (balance > 1 && dato < raiz->izq->dato) {
+        return rotacionDerecha(raiz);
+    }
+    if (balance < -1 && dato > raiz->der->dato) {
+        return rotacionIzquierda(raiz);
+    }
+    if (balance > 1 && dato > raiz->izq->dato) {
+        raiz->izq = rotacionIzquierda(raiz->izq);
+        return rotacionDerecha(raiz);
+    }
+    if (balance < -1 && dato < raiz->der->dato) {
+        raiz->der = rotacionDerecha(raiz->der);
+        return rotacionIzquierda(raiz);
+    }
+
+    return raiz;
+}
+	
 void mostrarArbol(nodo *arbol, int cont){
-	if(arbol == NULL){
-		return;
-		}else{
+	 if(arbol != NULL){
 		mostrarArbol(arbol->der,cont+1);
 			for(int i=0;i<cont;i++){
 				cout<<"   ";
@@ -75,38 +123,37 @@ void mostrarArbol(nodo *arbol, int cont){
 		}
 }
 
-void postOrden(nodo*arbol){
-	if(arbol==NULL){
+void postOrden(nodo* raiz){
+	if(raiz==NULL){
 		return;
 	}else{
-		postOrden(arbol->izq);
-		postOrden(arbol->der);
-		cout<<" ["<<arbol->dato<<"]->";
+		postOrden(raiz->izq);
+		postOrden(raiz->der);
+		cout<<" ["<<raiz->dato<<"]->";
 	}
 }
 
-void preOrden(nodo*arbol){
-	if(arbol==NULL){
-		return;
-	}else{
-		
-		cout<<" ["<<arbol->dato<<"]->";
-		preOrden(arbol->izq);
-		preOrden(arbol->der);
-	}
-}
-
-void inOrden(nodo*arbol){
-	if(arbol==NULL){
+void preOrden(nodo* raiz){
+	if(raiz==NULL){
 		return;
 	}else{
 		
-		inOrden(arbol->izq);
-		cout<<" ["<<arbol->dato<<"]->";
-		inOrden(arbol->der);
+		cout<<" ["<<raiz->dato<<"]->";
+		preOrden(raiz->izq);
+		preOrden(raiz->der);
 	}
 }
 
+void inOrden(nodo* raiz){
+	if(raiz==NULL){
+		return;
+	}else{
+		
+		inOrden(raiz->izq);
+		cout<<" ["<<raiz->dato<<"]->";
+		inOrden(raiz->der);
+	}
+}
 
 int cantNivel(nodo *arbol){
 	if (arbol!=NULL){
@@ -132,37 +179,15 @@ void MostrarNivel(nodo *arbol, int n){
 	}
 }
 
-int alturaNodo(nodo *arbol){
-	if(arbol!=NULL){
-		int hi = alturaNodo(arbol->izq);
-		int hd = alturaNodo(arbol->der);
-		if(hi>hd){
-			return hi+1;
-		}else{
-			return hd+1;
-		}
-	}
-}
-
-void MostrarAltura(nodo *arbol, int n){
-	if(arbol!=NULL){
-		if(n==0){
-			cout<<""<<arbol->altura+1<<"";
-		}
-		MostrarAltura(arbol->izq, n+1);
-		MostrarAltura(arbol->der, n+1);
-	}
-}
-
-void Eliminar(nodo* arbol, int n){
-	if (arbol==NULL){
+void Eliminar(nodo* raiz, int n){
+	if (raiz==NULL){
 		return;
-	}else if(n<arbol->dato){
-		Eliminar(arbol->izq, n);
-	}else if(n>arbol->dato){
-		Eliminar(arbol->der, n);
+	}else if(n<raiz->dato){
+		Eliminar(raiz->izq, n);
+	}else if(n>raiz->dato){
+		Eliminar(raiz->der, n);
 	}else{
-		eliminarNodo(arbol);
+		eliminarNodo(raiz);
 	}
 }
 
@@ -183,27 +208,27 @@ void eliminarNodo(nodo* nodoEliminar){
 	}
 }
 
-nodo* minimo(nodo* arbol){
-	if(arbol==NULL){
+nodo* minimo(nodo* raiz){
+	if(raiz==NULL){
 		return NULL;
 	}
-	if(arbol->izq){
-		return minimo(arbol->izq);
+	if(raiz->izq){
+		return minimo(raiz->izq);
 	}else{
-		return arbol;
+		return raiz;
 	}
 }
 
-void reemplazar(nodo* arbol, nodo* nuevoNodo){
-	if(arbol->padre){
-		if(arbol->dato == arbol->padre->izq->dato){
-			arbol->padre->der=nuevoNodo;
-		}else if(arbol->dato == arbol->padre->der->dato){
-			arbol->padre->der=nuevoNodo;
+void reemplazar(nodo* raiz, nodo* nuevoNodo){
+	if(raiz->padre){
+		if(raiz->dato == raiz->padre->izq->dato){
+			raiz->padre->der=nuevoNodo;
+		}else if(raiz->dato == raiz->padre->der->dato){
+			raiz->padre->der=nuevoNodo;
 		}
 	}
 	if(nuevoNodo){
-		nuevoNodo->padre=arbol->padre;
+		nuevoNodo->padre=raiz->padre;
 	}
 }
 
@@ -231,7 +256,7 @@ void menu (){
 	cout<<"\n Escoja una Opcion: ";
 }
 
-int main (){
+int main() {
 system("color f1");
 		struct nodo;
 		int opcion, dato, contador=0;
@@ -240,12 +265,12 @@ system("color f1");
 			cin>>opcion;
 			switch(opcion){
 				case 1:
-					cout<<"Ingrese un numero"<<endl;
+					cout<<"\n  Ingrese un numero \n"<<endl;
 					cin>>dato;
-					insertar(arbol,dato);
+					arbol = insertar(arbol,dato);
 					break;
 				case 2:
-					cout<<"Mostrando Arbol"<<endl;
+					cout<<"\n Mostrando Arbol \n"<<endl;
 					mostrarArbol(arbol,contador);
 					break;
 				case 3:
@@ -288,4 +313,6 @@ system("color f1");
 			system("pause");
 			system("cls");
 		}while(opcion!=0);
+		
+		return 0;
 }
