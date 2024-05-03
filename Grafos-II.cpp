@@ -2,6 +2,8 @@
 #include <map>
 #include <vector>
 #include <fstream>
+#include <queue>
+#include <climits>
 using namespace std;
 
 class Nodo{
@@ -16,15 +18,15 @@ class Nodo{
 		char info;
 		// metodos
 		bool buscarConexion(char clave);
-		void agregarConexion(char clave, Nodo* nodo, int valor);
+		void agregarConexion(char clave, Nodo* nodo);
 		void eliminarConexion(char clave);
 };
 
 // crear conexion entre nodos
-void Nodo::agregarConexion(char clave, Nodo* nodo, int valor){
+void Nodo::agregarConexion(char clave, Nodo* nodo){
 	conexiones[clave] = nodo;
-	cargas[clave] = valor;
 }
+
 
 // eliminar conexion entre nodos
 void Nodo::eliminarConexion(char clave){
@@ -51,18 +53,27 @@ class Grafo{
 			this->maximo = 15;
 		};
 		// mapeo de nodos en el grafo
+		
 		map<char, Nodo*> nodosTotales;
+		map<pair<char, char>, int> conexionesConValor;
 		vector<Nodo*> listaNodos();
+		
 		// propiedades del grafo
 		char nomenclatura;
 		int maximo;
+		int valorPorDefecto = 0;
 		// metodos
+		
 		void agregarNodo();
+		void generarConexion(char nodo1, char nodo2);
 		void generarConexion(char nodo1, char nodo2, int valor);
 		void eliminarNodo(char clave);
 		void borrarConexion(char nodo1, char nodo2);
 		void mostrarNodos();
 		void mapaAdyacencia();
+		void mapaAdyacencia2(int valor);
+		void mostrarCorta();
+		void rutaMasCorta(char origen, char destino);
 		void menu();
 };
 
@@ -78,24 +89,31 @@ void Grafo::agregarNodo(){
 	}
 }
 
-// generar conexion mediante los metodos del nodo
-void Grafo::generarConexion(char nodo1, char nodo2, int valor){
-	auto it1 = nodosTotales.find(nodo1);
-	auto it2 = nodosTotales.find(nodo2);
-	if(it1 != nodosTotales.end() && it2 != nodosTotales.end()){
-		if(nodo1 != nodo2){
-			Nodo *conn1 = nodosTotales[nodo1];
-			Nodo *conn2 = nodosTotales[nodo2];
-			conn1->agregarConexion(nodo2, conn2, valor);
-			conn2->agregarConexion(nodo1, conn1, valor);
-			
-		} else {
-			Nodo *conn = nodosTotales[nodo1];
-			conn->agregarConexion(nodo1, conn, valor);
-		}
-	} else {
-		printf("Nodos no existentes");
-	}
+void Grafo::generarConexion(char nodo1, char nodo2) {
+    generarConexion(nodo1, nodo2, valorPorDefecto);
+}
+
+void Grafo::generarConexion(char nodo1, char nodo2, int valor) {
+    auto it1 = nodosTotales.find(nodo1);
+    auto it2 = nodosTotales.find(nodo2);
+    if (it1 != nodosTotales.end() && it2 != nodosTotales.end()) {
+        if (nodo1 != nodo2) {
+            Nodo* conn1 = nodosTotales[nodo1];
+            Nodo* conn2 = nodosTotales[nodo2];
+            conn1->agregarConexion(nodo2, conn2);
+            conn2->agregarConexion(nodo1, conn1);
+            conexionesConValor[{nodo1, nodo2}] = valor;
+            conexionesConValor[{nodo2, nodo1}] = valor;
+        }
+        else {
+            Nodo* conn = nodosTotales[nodo1];
+            conn->agregarConexion(nodo1, conn);
+            conexionesConValor[{nodo1, nodo1}] = valor;
+        }
+    }
+    else {
+        cout << "Nodos no existentes" << endl;
+    }
 }
 
 // eliminar nodos y sus conexiones del grafo
@@ -159,17 +177,14 @@ vector<Nodo*> Grafo::listaNodos(){
 void Grafo::mapaAdyacencia(){
 	int alcance = nodosTotales.size();
 	int ady[alcance][alcance];
-	int valuar[alcance][alcance];
 	vector<Nodo*> nodos = listaNodos();
 	for(int i=0; i<alcance; i++){
 		Nodo *nodoIt = nodos[i];
 		for(int j=0; j<alcance; j++){
 			if(nodoIt->buscarConexion(nodos[j]->info)){
 				ady[i][j] = 1;
-				valuar[i][j] = nodos[j]->cargas[nodos[j]->info];
 			} else {
 				ady[i][j] = 0;
-				valuar[i][j] = 0;
 			}
 		}
 	}
@@ -183,18 +198,78 @@ void Grafo::mapaAdyacencia(){
 		}
 		printf("\n");
 	}
-	printf("\n");
+}
+
+void Grafo::mapaAdyacencia2(int valor){
+	int alcance = nodosTotales.size();
+	vector<Nodo*> nodos = listaNodos();
+	cout<<"   ";
 	for(int i=0; i<alcance; i++){
-		Nodo *nodoIt = nodos[i];
-		for(int j=0; j<alcance; j++){
-			if(j==0){
-				printf(" %c ",nodoIt->info);
-			}
-			printf(" %d ",valuar[i][j]);
-		}
-		printf("\n");
+		cout<<"  "<<nodos[i]->info;
 	}
-	printf("\n");
+	cout<<endl;
+	for(int i=0; i<alcance; ++i){
+		Nodo *nodoIt = nodos[i];
+		cout<<nodoIt->info<<"  ";
+		for(int j=0; j<alcance; ++j){
+			if(nodoIt->buscarConexion(nodos[j]->info)){
+				cout<<"  "<<conexionesConValor[{alcance}] = valor;
+			}else{
+			cout<<"  0";
+			}
+		
+		}
+		cout<<endl;
+	}
+	cout<<endl;
+}
+
+void Grafo::rutaMasCorta(char origen, char destino){
+	map<char, int> distancia;
+	map<char, char> anterior;
+	priority_queue<pair<int, char>> pq;
+	
+	for (auto& nodo : nodosTotales){
+		distancia[nodo.first]=INT_MAX;
+		anterior[nodo.first] = 0;
+	}
+	
+	distancia[origen] = 0;
+	pq.push({0, origen});
+	
+	while (!pq.empty()){
+		char nodoActual = pq.top().second;
+		pq.pop();
+		
+		for (auto& conexion : nodosTotales[nodoActual]->conexiones){
+			char nodoVecino = conexion.first;
+			int peso = nodosTotales[nodoActual]->cargas[nodoVecino];
+			if(distancia[nodoActual] + peso < distancia[nodoVecino]){
+				distancia[nodoVecino] = distancia[nodoActual] + peso;
+				anterior[nodoVecino] = nodoActual;
+				pq.push({-distancia[nodoVecino], nodoVecino});
+			}
+		}
+	}
+
+	vector<char> camino;
+	for(char nodo = destino; nodo!=0; nodo=anterior[nodo]){
+		camino.push_back(nodo);
+	}
+	if(camino.back()==destino){
+		cout<<"La distancia mas corta desde "<<origen << " hasta "
+		<<destino<<" es: "<< distancia[destino]<<endl;
+		cout<<"\n El camino es: "<<endl;
+		for(auto it = camino.rbegin(); it!=camino.rend(); ++it){
+			cout << *it;
+			if(it+1!=camino.rend()){
+				cout<<" -> ";
+			}
+		}
+		cout<<endl;
+	 } else {
+		cout<<"No hay camino desde "<<origen<<" hasta "<<destino<<endl;
+	}
 }
 
 void Grafo::menu(){
@@ -203,13 +278,16 @@ void Grafo::menu(){
 	cout<<"\n|-----------------------------------|";
 	cout<<"\n|               *GRAFO*             |";
 	cout<<"\n|-----------------------------------|";
-	cout<<"\n|      1.Agregar Nodo               |";
-	cout<<"\n|      2.Agregar Conexion           |";
-	cout<<"\n|      3.Mostrar Nodos      	    |";
-	cout<<"\n|      4.Mostrar mapa de adyacencia |";
-	cout<<"\n|      5.Eliminar Nodo              |";
-	cout<<"\n|      6.Eliminar Conexion          |";
-	cout<<"\n|      0.Salir                      |";
+	cout<<"\n|     1.Agregar Nodo                |";
+	cout<<"\n|     2.Agregar Conexion            |";
+	cout<<"\n|     3.Mostrar Nodos               |";
+	cout<<"\n|     4.Mostrar mapa de adyacencia  |";
+	cout<<"\n|     5.Mostrar mapa de adyacencia 2|";
+	cout<<"\n|     6.Mostrar Camino mas corto    |";
+	
+	cout<<"\n|     7.Eliminar Nodo               |";
+	cout<<"\n|     8.Eliminar Conexion           |";
+	cout<<"\n|     0.Salir                       |";
 	cout<<"\n|-----------------------------------|";
 	cout<<"\n Escoja una Opcion: ";
 }
@@ -229,6 +307,7 @@ bool isCharacter(char caracter){
 // metodo main
 int main(){
 	int valor;
+	char  origen, destino;
 	int op = 0;
 	char nodo1, nodo2;
 	Grafo grafoX;
@@ -247,7 +326,7 @@ int main(){
 				if(isCharacter(nodo1) && isCharacter(nodo2)){
 					printf("Valor: "); cin>>valor;
 					grafoX.generarConexion(nodo1, nodo2, valor);
-				} else {
+				}else {
 					printf("Caracteres no validos\n");
 				}
 				break;
@@ -258,18 +337,29 @@ int main(){
 				grafoX.mapaAdyacencia();
 				break;
 			case 5:
-				printf("Ingrese el nodo a eliminar debe ser existente: "); cin>>nodo1;
-				grafoX.eliminarNodo(nodo1);
+				grafoX.mapaAdyacencia2(valor);	
 				break;
 			case 6:
+				cout<<"Ingrese la ruta que quieres trasar: \n";
+				cout<<"Origen: "; cin>>origen;
+				cout<<"Destino: "; cin>>destino;
+				grafoX.rutaMasCorta(origen, destino);
+				break;
+			case 7:
+				printf("Ingrese el nodo a eliminar debe ser existente: \n"); 
+				cin>>nodo1;
+				grafoX.eliminarNodo(nodo1);
+				break;
+			case 8:
 				printf("Ingrese la conexion que desea eliminar, debe ser existente\n");
 				printf("Nodo 1: "); cin>>nodo1;
 				printf("Nodo 2: "); cin>>nodo2;
 				grafoX.borrarConexion(nodo1, nodo2);
 				break;
 			case 0:
-				printf("\n Gracias");
+				printf("\n Saliendo...");
 				exit(0);
+				break;
 			default:
 				printf("\n  Opcion Invalida");
 		}
